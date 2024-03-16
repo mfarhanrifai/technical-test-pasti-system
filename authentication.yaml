@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Auth API
+  description: API that uses a Authentication & Authorization PT. XYZ Loan Apps
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Swagger API Team
+    email: apiteam@swagger.io
+    url: http://swagger.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://xyzloan.com/auth-service/v1/
+paths:
+  /auth:
+    get:
+      tags:
+        - Authentication
+      summary: Search 'Authentication' by seacrh criteria.
+      description: Search 'Authentication' by seacrh criteria.
+      operationId: findAuthentication
+      parameters:
+        - name: filters
+          in: query
+          description: "Query parameter to specify search filters. Attribute filters are specified in the following way- 
+            ?filters=[attributeName][operator][value].
+            ex. 
+            ?filters=customerId==12345678;
+          "
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: "Requested number of page"
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: " Requested number of record to be provided in the response requested by client
+            - Default value if not passed : 20
+            - Maximum value supported 200"
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: "Sort attribute
+          ex. 
+          sort=customerId&sort=DESC"
+          schema:
+            type: string
+            
+      responses:
+        '200':
+          description: Get Authentication Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Auth'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Authentication
+      summary: Creates a New Authentication.
+      description: Creates a New Authentication.
+      operationId: createAuth
+      requestBody:
+        description: API to Create New Authentication
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuth'
+      parameters:
+        - name: Token
+          in: query
+          description: Token Generation
+          required: true
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Local of the client
+          required: false
+          schema:
+            type: string
+
+      responses:
+        '201':
+          description: Create Authentication Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /auth/{id}:
+    get:
+      tags:
+        - Authentication
+      summary: Retrieves a 'Authentication' by identifier
+      description: Retrieves a 'Authentication' by identifier
+      operationId: retrieveAuthentication
+      parameters:
+        - name: id
+          in: path
+          description: ID of Authentication to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Retrieve Authentication Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /checkToken/{id}/{token}:
+    get:
+      tags:
+        - Authentication
+      summary: Check a 'Token' by identifier
+      description: Retrieves a 'Token' by identifier
+      operationId: checkToken
+      parameters:
+        - name: id
+          in: path
+          description: ID of Customer ID to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: token
+          in: path
+          description: Token received by Customer
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Retrieve Authentication Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+
+components:
+  schemas:
+    Auth:
+      allOf:
+        - $ref: '#/components/schemas/Auth'
+        - type: object
+      required:
+          - tokenId
+          - customerId
+          - tokenValue
+          - expirationDate
+      properties:
+            tokenId:
+              type: string
+            customerId:
+              type: string
+            tokenValue:
+              type: string
+            expirationDate:
+              type: string
+
+    AuthDetail:
+      type: object
+      required:
+          - tokenId
+          - customerId
+          - tokenType
+          - expirationDate
+      properties:
+            tokenId:
+              type: string
+            customerId:
+              type: string
+            tokenType:
+              type: string
+            expirationDate:
+              type: string
+            customer:
+              type: array
+              items:
+                $ref: '#/components/schemas/Customer'
+
+    CreateAuth:
+      type: object
+      required:
+          - tokenId
+          - customerId
+          - tokenType
+          - expirationDate
+      properties:
+            customerId:
+              type: string
+            tokenValue:
+              type: string
+            expirationDate:
+              type: string
+
+
+    Customer:
+      type: object
+      required:
+          - customerId
+          - firstName
+          - lastname
+          - phoneNumber
+          - gender
+          - dob
+          - status
+      properties:
+            firstName:
+              type: string
+            lastName:
+              type: string
+            phoneNumber:
+              type: string
+            gender:
+              type: string
+            dob:
+              type: string
+            address:
+              type: string
+            state:
+              type: string
+            city:
+              type: string
+            postalCode:
+              type: string
+            status:
+              type: string
+   
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

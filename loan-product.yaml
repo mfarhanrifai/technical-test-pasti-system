@@ -1,0 +1,278 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Loan Product API
+  description: API that uses a loan product management PT. XYZ Loan Apps
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Swagger API Team
+    email: apiteam@swagger.io
+    url: http://swagger.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://xyzloan.com/loan-service/v1/
+paths:
+  /loanProduct:
+    get:
+      tags:
+        - Loan Product
+      summary: Search 'Loan Product' by seacrh criteria.
+      description: Search 'Loan Product' by seacrh criteria.
+      operationId: findLoan
+      parameters:
+        - name: filters
+          in: query
+          description: "Query parameter to specify search filters. Attribute filters are specified in the following way- 
+            ?filters=[attributeName][operator][value].
+            ex. 
+            ?filters=productName==personal;
+          "
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: "Requested number of page"
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: " Requested number of record to be provided in the response requested by client
+            - Default value if not passed : 20
+            - Maximum value supported 200"
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: "Sort attribute
+          ex. 
+          sort=productName&sort=DESC"
+          schema:
+            type: string
+            
+      responses:
+        '200':
+          description: Get Loan Product Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoanProduct'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Loan Product
+      summary: Creates a New Loan Product.
+      description: Creates a New Loan Product.
+      operationId: createLoanProduct
+      requestBody:
+        description: API to Create New Loan product
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLoanProduct'
+      parameters:
+        - name: Token
+          in: query
+          description: Token Generation
+          required: true
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Local of the client
+          required: false
+          schema:
+            type: string
+
+      responses:
+        '201':
+          description: Create Request Loan Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanProduct'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /loanProduct/{id}:
+    get:
+      tags:
+        - Loan Product
+      summary: Retrieves a 'Loan Product' by identifier
+      description: Retrieves a 'Loan Product' by identifier
+      operationId: retrieveLoanProduct
+      parameters:
+        - name: id
+          in: path
+          description: ID of loan product to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Retrieve Loan Product Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanProduct'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Loan Product
+      summary: Updates partially a 'Loan Product' by identifier
+      description: |
+        Update partially a 'Loan Product' by identifier.
+        
+        Supported paths and corresponding operations for update elements
+        
+        - /productName
+        - /minAmount
+        - /maxAmount
+        - /tenor
+        - /interest
+        - /status
+        - /updatedBy
+        - /updatedAt
+      operationId: updateLoanProduct
+      parameters:
+        - name: id
+          in: path
+          description: ID of loan product to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Update Loan Product Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanProduct'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    LoanProduct:
+      allOf:
+        - $ref: '#/components/schemas/LoanProduct'
+        - type: object
+      required:
+          - loanProductId
+          - productName
+          - minAmount
+          - maxAmount
+          - tenor
+          - interest
+          - status
+      properties:
+            loanProductId:
+              type: string
+            productName:
+              type: string
+            minAmount:
+              type: string
+            maxAmount:
+              type: string
+            tenor:
+              type: string
+            interest:
+              type: string
+            status:
+              type: string
+            created_by:
+              type: string
+            created_at:
+              type: string
+            updated_by:
+              type: string
+            updated_at:
+              type: string
+
+   
+    CreateLoanProduct:
+      type: object
+      required:
+          - loanProductId
+          - productName
+          - minAmount
+          - maxAmount
+          - tenor
+          - interest
+          - status
+          - created_by
+          - created_at
+      properties:
+            productName:
+              type: string
+            minAmount:
+              type: string
+            maxAmount:
+              type: string
+            tenor:
+              type: string
+            interest:
+              type: string
+            status:
+              type: string
+            created_by:
+              type: string
+            created_at:
+              type: string
+
+  
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

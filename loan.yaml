@@ -1,0 +1,328 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Loan API
+  description: API that uses a loan management PT. XYZ Loan Apps
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Swagger API Team
+    email: apiteam@swagger.io
+    url: http://swagger.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://xyzloan.com/loan-service/v1/
+paths:
+  /loan:
+    get:
+      tags:
+        - Loan
+      summary: Search 'Loan' by seacrh criteria.
+      description: Search 'Loan' by seacrh criteria.
+      operationId: findLoan
+      parameters:
+        - name: filters
+          in: query
+          description: "Query parameter to specify search filters. Attribute filters are specified in the following way- 
+            ?filters=[attributeName][operator][value].
+            ex. 
+            ?filters=loanType==personal;
+          "
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: "Requested number of page"
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: " Requested number of record to be provided in the response requested by client
+            - Default value if not passed : 20
+            - Maximum value supported 200"
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: "Sort attribute
+          ex. 
+          sort=loanType&sort=DESC"
+          schema:
+            type: string
+            
+      responses:
+        '200':
+          description: Get Loan Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Loan'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Loan
+      summary: Creates a Request Loan.
+      description: Creates a Request Loan.
+      operationId: requestLoan
+      requestBody:
+        description: API to Customer Request New Loan
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLoan'
+      parameters:
+        - name: Token
+          in: query
+          description: Token Generation
+          required: true
+          schema:
+            type: string
+        - name: Accept-Language
+          in: header
+          description: Local of the client
+          required: false
+          schema:
+            type: string
+
+      responses:
+        '201':
+          description: Create Request Loan Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /loan/{id}:
+    get:
+      tags:
+        - Loan
+      summary: Retrieves a 'Loan' by identifier
+      description: Retrieves a 'Loan' by identifier
+      operationId: retrieveCustomer
+      parameters:
+        - name: id
+          in: path
+          description: ID of loan to fetch
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Retrieve Loan Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Loan
+      summary: Updates partially a 'Loan' by identifier
+      description: |
+        Update partially a 'Loan' by identifier.
+        
+        Supported paths and corresponding operations for update elements
+        
+        - /status
+      operationId: updateLoan
+      parameters:
+        - name: id
+          in: path
+          description: ID of loan to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Update Loan Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Loan:
+      allOf:
+        - $ref: '#/components/schemas/Loan'
+        - type: object
+      required:
+          - loanId
+          - customerId
+          - loanProductId
+          - loanTenor
+          - loanAmount
+          - orderDate
+          - status
+      properties:
+            loanId:
+              type: string
+            customerId:
+              type: string
+            loanProductId:
+              type: string
+            loanTenor:
+              type: string
+            loanAmount:
+              type: string
+            orderDate:
+              type: string
+            status:
+              type: string
+
+    LoanDetail:
+      type: object
+      required:
+          - loanId
+          - customerId
+          - loanProductId
+          - loanTenor
+          - loanAmount
+          - orderDate
+          - status
+      properties:
+            loanId:
+              type: string
+            customerId:
+              type: string
+            loanProfile:
+              type: array
+              items:
+                $ref: '#/components/schemas/LoanProfile'
+            loanProduct:
+              type: array
+              items:
+                $ref: '#/components/schemas/LoanProduct'
+            loanTenor:
+              type: string
+            loanAmount:
+              type: string
+            orderDate:
+              type: string
+            status:
+              type: string
+
+    CreateLoan:
+      type: object
+      required:
+          - loanId
+          - customerId
+          - loanProductId
+          - loanTenor
+          - loanAmount
+          - orderDate
+          - status
+      properties:
+            customerId:
+              type: string
+            loanProductId:
+              type: string
+            loanTenor:
+              type: string
+            loanAmount:
+              type: string
+            orderDate:
+              type: string
+            status:
+              type: string
+              
+    LoanProduct:
+      type: object
+      required:
+          - loanProductId
+          - minAmount
+          - maxAmount
+          - tenor
+          - interest
+          - status
+      properties:
+            loanProductId:
+              type: string
+            minAmount:
+              type: string
+            maxAmount:
+              type: string
+            tenor:
+              type: string
+            interest:
+              type: string
+            status:
+              type: string
+              
+    LoanProfile:
+      type: object
+      required:
+          - loanProfileId
+          - maxAmount
+          - maxTenor
+          - status
+      properties:
+            loanProfileId:
+              type: string
+            maxAmount:
+              type: string
+            maxTenor:
+              type: string
+            status:
+              type: string
+              
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
